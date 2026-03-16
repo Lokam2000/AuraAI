@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 class ChatViewModel(application: Application) : AndroidViewModel(application) {
 
     private val messageDao = AppDatabase.getDatabase(application).messageDao()
-    private val apiService = ApiClient.getApiService("your-api-key-here") // We'll replace this later
 
     // Messages flow
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
@@ -40,7 +40,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Send message to AI
+    // Send message and get AI response
     fun sendMessage(userMessage: String) {
         if (userMessage.isBlank()) return
 
@@ -57,23 +57,11 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 messageDao.insertMessage(userMsg)
 
-                // Create request for Claude
-                val messages = (_messages.value + userMsg).map { msg ->
-                    ChatMessage(
-                        role = if (msg.isUserMessage) "user" else "assistant",
-                        content = msg.text
-                    )
-                }
+                // Simulate API delay (like Claude is thinking)
+                delay(1500)
 
-                val request = MessageRequest(
-                    messages = messages
-                )
-
-                // Get response from Claude API
-                val response = apiService.sendMessage(request)
-
-                // Extract AI response
-                val aiResponseText = response.content.firstOrNull()?.text ?: "No response"
+                // Get contextual response based on user input
+                val aiResponseText = getContextualResponse(userMessage)
 
                 // Save AI message
                 val aiMsg = Message(
@@ -92,15 +80,59 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // Get contextual response based on user input
+    private fun getContextualResponse(userMessage: String): String {
+        val lowerMessage = userMessage.lowercase().trim()
+
+        return when {
+            // Greetings
+            lowerMessage.contains("hi") || lowerMessage.contains("hello") || lowerMessage.contains("hey") -> {
+                "Hello! 👋 I'm AuraAI, your AI assistant. How can I help you today?"
+            }
+            lowerMessage.contains("how are you") || lowerMessage.contains("how r u") -> {
+                "I'm doing great, thanks for asking! 😊 I'm here to help with anything you need. What's on your mind?"
+            }
+            lowerMessage.contains("what is your name") || lowerMessage.contains("who are you") -> {
+                "I'm AuraAI! 🌟 An AI chat assistant built with Kotlin, Compose, and modern Android technologies."
+            }
+            lowerMessage.contains("what can you do") || lowerMessage.contains("what can you help") -> {
+                "I can help you with coding, writing, analysis, math, learning, creative projects, and much more! Ask me anything! 💡"
+            }
+            lowerMessage.contains("kotlin") || lowerMessage.contains("android") || lowerMessage.contains("compose") -> {
+                "Great topic! Kotlin is amazing for Android development, and Jetpack Compose makes building beautiful UIs so much easier with its declarative approach. Are you learning Android development? 📱"
+            }
+            lowerMessage.contains("thank") || lowerMessage.contains("thanks") -> {
+                "You're welcome! 😊 Happy to help. Is there anything else you'd like to know?"
+            }
+            lowerMessage.contains("bye") || lowerMessage.contains("goodbye") -> {
+                "Goodbye! 👋 It was great chatting with you. Feel free to come back anytime! 🚀"
+            }
+            lowerMessage.contains("help") -> {
+                "Of course! I'm here to help. You can ask me about coding, Android development, Kotlin, Compose, problem-solving, and much more. What do you need help with?"
+            }
+            lowerMessage.contains("app") || lowerMessage.contains("auraai") -> {
+                "AuraAI is a beautiful AI chat application built with Jetpack Compose! It demonstrates modern Android architecture with MVVM, Room database, and stunning UI design. Pretty cool, right? 🎨"
+            }
+            lowerMessage.contains("?") -> {
+                "Great question! Let me think about that... The key to mastering Android development is consistent practice, building projects, and understanding the architecture patterns. Keep learning! 🎓"
+            }
+            else -> {
+                // Default responses for anything else
+                listOf(
+                    "That's interesting! Tell me more about that. 🤔",
+                    "I love your curiosity! What else would you like to know? 💭",
+                    "That's a great point! Keep exploring and learning. 📚",
+                    "Fascinating! Do you want to dive deeper into this topic? 🔍",
+                    "Absolutely! Learning is a never-ending journey. What's next? 🚀"
+                ).random()
+            }
+        }
+    }
+
     // Clear all messages
     fun clearChat() {
         viewModelScope.launch {
             messageDao.deleteConversation(conversationId)
         }
-    }
-
-    // Set API key
-    fun setApiKey(apiKey: String) {
-        // TODO: Update API service with new key
     }
 }
