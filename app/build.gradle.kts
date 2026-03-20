@@ -82,4 +82,7 @@ dependencies {
 
     // OkHttp for HTTP client
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Google Gemini AI
+    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
 }
