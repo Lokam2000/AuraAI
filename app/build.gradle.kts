@@ -58,10 +58,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Retrofit for API calls
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
     // Room Database
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -76,13 +72,4 @@ dependencies {
 
     // Material Design 3
     implementation("androidx.compose.material3:material3:1.2.0")
-
-    // RecyclerView (if needed)
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-
-    // OkHttp for HTTP client
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-
-    // Google Gemini AI
-    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
 }

@@ -1,4 +1,4 @@
-package com.example.auraai
+package com.example.auraai.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,9 +7,8 @@ import androidx.room.PrimaryKey
 data class Message(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-
     val text: String,
-    val isUserMessage: Boolean, // true = user, false = AI
+    val isUserMessage: Boolean,
     val timestamp: Long = System.currentTimeMillis(),
     val conversationId: String = "default"
 )
